@@ -71,7 +71,7 @@ class _EventsScreenState extends State<EventsScreen>
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: FitnessAppTheme.background,
+      color: AppTheme.background,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -97,7 +97,7 @@ class _EventsScreenState extends State<EventsScreen>
               child: SpinKitPulse(
                 size: 100,
                 duration: Duration(seconds: 2),
-                color: FitnessAppTheme.nearlyBlue.withOpacity(0.5),
+                color: AppTheme.tab1Secondary.withOpacity(0.5),
               ),
             );
           default:
@@ -108,7 +108,7 @@ class _EventsScreenState extends State<EventsScreen>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Image.asset("assets/images/EmptyState.png",
-                        height: 250, width: 250),
+                        height: 150, width: 250, fit: BoxFit.scaleDown,),
                     Text(
                       "No Events Yet".toUpperCase(),
                       style: TextStyle(
@@ -116,7 +116,7 @@ class _EventsScreenState extends State<EventsScreen>
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                           letterSpacing: 0.2,
-                          color: AppTheme.nearlyBlack.withOpacity(0.8)),
+                          color:AppTheme.nearlyBlack.withOpacity(0.8)),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -128,7 +128,7 @@ class _EventsScreenState extends State<EventsScreen>
                             fontWeight: FontWeight.w400,
                             fontSize: 16,
                             letterSpacing: 0.2,
-                            color: AppTheme.nearlyBlack.withOpacity(0.6)),
+                            color:AppTheme.nearlyBlack.withOpacity(0.6)),
                       ),
                     )
                   ],
@@ -151,7 +151,7 @@ class _EventsScreenState extends State<EventsScreen>
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                           letterSpacing: 0.2,
-                          color: AppTheme.nearlyBlack.withOpacity(0.6)),
+                          color:AppTheme.nearlyBlack.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -166,7 +166,7 @@ class _EventsScreenState extends State<EventsScreen>
                       top: AppBar().preferredSize.height +
                           MediaQuery.of(context).padding.top +
                           24,
-                      bottom: 62 + MediaQuery.of(context).padding.bottom,
+                      bottom: 92 + MediaQuery.of(context).padding.bottom,
                     ),
                     itemCount: events.length,
                     scrollDirection: Axis.vertical,
@@ -208,13 +208,13 @@ class _EventsScreenState extends State<EventsScreen>
                         0.0, 30 * (1.0 - topBarAnimation.value), 0.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: FitnessAppTheme.white.withOpacity(snapshot.data),
+                        color: AppTheme.white.withOpacity(snapshot.data),
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(32.0),
                         ),
                         boxShadow: <BoxShadow>[
                           BoxShadow(
-                              color: FitnessAppTheme.grey
+                              color: AppTheme.grey
                                   .withOpacity(0.4 * snapshot.data),
                               offset: const Offset(1.1, 1.1),
                               blurRadius: 10.0),
@@ -238,11 +238,11 @@ class _EventsScreenState extends State<EventsScreen>
                                 'Events',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
-                                  fontFamily: FitnessAppTheme.fontName,
+                                  fontFamily: AppTheme.fontName,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 22 + 6 - 6 * snapshot.data,
                                   letterSpacing: 1.2,
-                                  color: FitnessAppTheme.darkerText,
+                                  color: AppTheme.darkerText,
                                 ),
                               ),
                             ),
@@ -264,7 +264,13 @@ class _EventsScreenState extends State<EventsScreen>
     await API.getData(url).then((response) {
       setState(() {
         Iterable list = json.decode(response.body);
-        events = list.map((model) => Event.fromJson(model)).toList();
+        List<Event> list2 = list.map((model) => Event.fromJson(model)).toList();
+        list2.sort((a,b) {
+          var aDate = DateTime.parse(a.date);
+          var bDate = DateTime.parse(b.date);
+          return bDate.compareTo(aDate);
+        });
+        events = list2;
       });
     });
   }

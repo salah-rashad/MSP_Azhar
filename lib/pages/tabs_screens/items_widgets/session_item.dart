@@ -1,29 +1,40 @@
+import 'dart:convert';
+import 'dart:core';
+
 import 'package:auto_direction/auto_direction.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:geocoder/model.dart';
-import 'package:intl/intl.dart';
-import 'package:msp/main.dart';
-import 'package:msp/models/event.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:msp/models/session.dart';
+import 'package:msp/models/playlist.dart';
 import 'package:msp/ui/app_theme.dart';
 import 'package:msp/utils/constants.dart';
+import 'package:http/http.dart' as http;
 
-import '../../home.dart';
+Session _session;
 
 class SessionItem extends StatefulWidget {
   final Session session;
   final Animation animation;
   final AnimationController animationController;
-  
+
   const SessionItem(this.session, this.animation, this.animationController);
-  
+
   @override
   _SessionItemState createState() => _SessionItemState();
 }
 
 class _SessionItemState extends State<SessionItem> {
-  
+  Future<PlayList> playlist;
+
+  @override
+  void initState() {
+    _session = widget.session;
+    setState(() {
+      playlist = fetchPlaylist().catchError((e) => print(e));
+    });
+    super.initState();
+  }
+
   Widget _buildSessionCard(BuildContext context, Session session) {
     return AnimatedBuilder(
       animation: widget.animationController,
@@ -32,89 +43,155 @@ class _SessionItemState extends State<SessionItem> {
           opacity: widget.animation,
           child: new Transform(
             transform: new Matrix4.translationValues(
-              0.0, 30 * (1.0 - widget.animation.value), 0.0),
+                0.0, 30 * (1.0 - widget.animation.value), 0.0),
             child: Container(
-              height: 80.0,
-              margin: new EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              height: 100.0,
+              margin: new EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: new BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: FitnessAppTheme.nearlyBlue,
+                    color: AppTheme.tab2Secondary,
                     blurRadius: 30.0,
                     // has the effect of softening the shadow
-                    spreadRadius: -10.0,
+                    spreadRadius: 0.0,
                     // has the effect of extending the shadow
                     offset: Offset(
-                      5.0, // horizontal, move right 5
-                      5.0, // vertical, move down 5
+                      0.0, // horizontal, move right 5
+                      7.0, // vertical, move down 5
                     ),
                   )
                 ],
                 borderRadius: BorderRadius.circular(30.0),
                 gradient: new LinearGradient(
                   colors: [
-                    FitnessAppTheme.nearlyDarkBlue,
-                    FitnessAppTheme.nearlyBlue
+                    AppTheme.tab2Primary,
+                    AppTheme.tab2Secondary,
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
               ),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 22.0),
-                child: AutoDirection(
-                  text: session.name,
-                  child: Text(
-                    session.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppTheme.nearlyWhite,
-                      fontSize: 18,
-                      shadows: [
-                        Shadow(
-                          color: AppTheme.nearlyBlack,
-                          offset: Offset(0.8, 0.8),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              child: FutureBuilder(
+                  future: playlist,
+                  builder: (context, snapshot) {
+                    PlayList playlist = snapshot.data;
+
+                    if (!snapshot.hasData) {
+                      return SpinKitPulse(
+                        size: 26,
+                        duration: Duration(seconds: 2),
+                        color: AppTheme.nearlyWhite.withOpacity(0.5),
+                      );
+                    } else
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 32.0, vertical: 16.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                height: 60,
+                                width: 80,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image.network(
+                                    playlist.items[0].imageDefault,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Flexible(
+                                child: AutoDirection(
+                                  text: session.name,
+                                  child: Text(
+                                    session.name,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppTheme.nearlyWhite,
+                                      fontSize: 14,
+                                      shadows: [
+                                        Shadow(
+                                          color: AppTheme.nearlyBlack,
+                                          offset: Offset(0.8, 0.8),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              playlist.items.isNotEmpty &&
+                                      playlist.items.length != null
+                                  ? Row(
+                                      children: <Widget>[
+                                        SizedBox(width: 16),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              playlist.items.length.toString(),
+                                              style: TextStyle(
+                                                color: AppTheme.white
+                                                    .withOpacity(0.8),
+                                                fontSize: 22,
+                                              ),
+                                            ),
+                                            Text(
+                                              "Videos".toUpperCase(),
+                                              style: TextStyle(
+                                                color: AppTheme.nearlyWhite,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w300,
+                                                height: 2,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Container()
+                            ],
+                          ),
+                        ),
+                      );
+                  }),
             ),
           ),
         );
       },
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-        Navigator.pushNamed(context, fullSessionRoute, arguments: widget.session),
+      onTap: () => Navigator.pushNamed(context, detailedSessionRoute,
+          arguments: widget.session),
       child: _buildSessionCard(context, widget.session),
     );
   }
-  
-  
 }
 
-getDateTime(String date, String time) {
-  return DateFormat("dd/MM/yyyy - hh:mm a").format(
-    DateTime.parse("$date $time"),
-  );
-}
+Future<PlayList> fetchPlaylist() async {
+  // Getting playlist id from playlist link.
+  String playlistID = _session.courseLink.split("list=")[1];
+  // Unique API key of YouTube Data API.
+  String API_KEY = "AIzaSyBKnPJ-IxA__CXleozkk2uM-NqKdL4LVjU";
 
-Future<Address> getLocation(String link) async {
-  final cut1 = link.split("/@");
-  final cut2 = cut1[1].split("/data");
-  final cut3 = cut2[0].split(",");
-  
-  double a = double.parse(cut3[0]);
-  double b = double.parse(cut3[1]);
-  final coordinates = new Coordinates(a, b);
-  var addresses =
-  await Geocoder.local.findAddressesFromCoordinates(coordinates);
-  return addresses.first;
+  // Youtube playlist snippet response.
+  final response = await http.get(
+      'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=$playlistID&fields=items%2Fsnippet&key=$API_KEY');
+
+  if (response.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON.
+    return PlayList.fromJson(json.decode(response.body));
+  } else {
+    // If that call was not successful, throw an error.
+    throw Exception('Failed to load playlist');
+  }
 }

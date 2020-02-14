@@ -13,7 +13,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="msp"
+        android:label="MSP Azhar"
         android:icon="@mipmap/ic_launcher"
         tools:ignore="GoogleAppIndexingWarning">
         <activity

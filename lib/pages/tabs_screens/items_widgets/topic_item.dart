@@ -11,14 +11,14 @@ class TopicItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: FitnessAppTheme.nearlyBlue2.withOpacity(0.03),
+      color: AppTheme.nearlyBlue2.withOpacity(0.03),
       padding: EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             "${index + 1}. " + topic.title,
-            style: FitnessAppTheme.title,
+            style: AppTheme.title,
           ),
           SizedBox(height: 8),
           Row(
@@ -26,7 +26,7 @@ class TopicItem extends StatelessWidget {
               SizedBox(width: 25),
               Text(
                 "• " + topic.sName.toUpperCase(),
-                style: AppTheme.subtitle,
+                style:AppTheme.subtitle,
               ),
             ],
           ),
@@ -37,7 +37,7 @@ class TopicItem extends StatelessWidget {
               Flexible(
                 child: Text(
                   topic.sJob,
-                  style: TextStyle(fontWeight: FontWeight.w300, fontSize: 14, color: AppTheme.nearlyBlack.withOpacity(0.6)),
+                  style: TextStyle(fontWeight: FontWeight.w300, fontSize: 14, color:AppTheme.nearlyBlack.withOpacity(0.6)),
                 ),
               )
             ],

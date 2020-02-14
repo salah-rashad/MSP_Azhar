@@ -1,9 +1,9 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:msp/main.dart';
 import 'package:msp/models/tabIcon_data.dart';
 import 'package:msp/ui/app_theme.dart';
-
-import '../main.dart';
 
 class BottomBarView extends StatefulWidget {
   const BottomBarView(
@@ -43,7 +43,7 @@ class _BottomBarViewState extends State<BottomBarView>
             return Transform(
               transform: Matrix4.translationValues(0.0, 0.0, 0.0),
               child: PhysicalShape(
-                color: FitnessAppTheme.white,
+                color: AppTheme.white,
                 elevation: 16.0,
                 clipper: TabClipper(
                     radius: Tween<double>(begin: 0.0, end: 1.0)
@@ -63,6 +63,7 @@ class _BottomBarViewState extends State<BottomBarView>
                           children: <Widget>[
                             Expanded(
                               child: TabIcons(
+                                selectedIndex: 0,
                                   tabIconData: widget.tabIconsList[0],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -72,6 +73,7 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
+                                selectedIndex: 1,
                                   tabIconData: widget.tabIconsList[1],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -89,6 +91,7 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
+                                selectedIndex: 2,
                                   tabIconData: widget.tabIconsList[2],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -98,6 +101,7 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
+                                selectedIndex: 3,
                                   tabIconData: widget.tabIconsList[3],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -154,7 +158,7 @@ class _BottomBarViewState extends State<BottomBarView>
                         shape: BoxShape.circle,
                         boxShadow: <BoxShadow>[
                           BoxShadow(
-                              color: FitnessAppTheme.nearlyDarkBlue.withOpacity(0.3),
+                              color: AppTheme.nearlyDarkBlue.withOpacity(0.2),
                               offset: const Offset(0.0, 8.0),
                               blurRadius: 20.0),
                         ],
@@ -201,9 +205,10 @@ class _BottomBarViewState extends State<BottomBarView>
 }
 
 class TabIcons extends StatefulWidget {
-  const TabIcons({Key key, this.tabIconData, this.removeAllSelect})
+  const TabIcons({Key key,this.selectedIndex, this.tabIconData, this.removeAllSelect})
       : super(key: key);
 
+  final int selectedIndex;
   final TabIconData tabIconData;
   final Function removeAllSelect;
 
@@ -212,8 +217,22 @@ class TabIcons extends StatefulWidget {
 }
 
 class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
+  Color circlesColor = AppTheme.nearlyDarkBlue;
+  
   @override
   void initState() {
+    
+    switch (widget.selectedIndex) {
+      case 0: circlesColor = AppTheme.tab1Primary;
+      break;
+      case 1: circlesColor = AppTheme.tab2Primary;
+      break;
+      case 2: circlesColor = AppTheme.tab3Primary;
+      break;
+      case 3: circlesColor = AppTheme.tab4Primary;
+      break;
+    }
+    
     widget.tabIconData.animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -279,7 +298,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: FitnessAppTheme.nearlyDarkBlue,
+                        color: circlesColor,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -300,7 +319,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       width: 4,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: FitnessAppTheme.nearlyDarkBlue,
+                        color: circlesColor,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -321,7 +340,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: FitnessAppTheme.nearlyDarkBlue,
+                        color: circlesColor,
                         shape: BoxShape.circle,
                       ),
                     ),

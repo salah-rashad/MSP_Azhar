@@ -10,6 +10,16 @@ import 'package:msp/utils/router.dart';
 import 'ui/app_theme.dart';
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness:
+    Platform.isAndroid ? Brightness.dark : Brightness.light,
+    systemNavigationBarColor: Colors.white,
+    systemNavigationBarDividerColor: Colors.grey,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  ));
+  
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
@@ -21,22 +31,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness:
-          Platform.isAndroid ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarDividerColor: Colors.grey,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ));
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "MSP Azhar",
       theme: ThemeData(
+        brightness: Brightness.light,
         primarySwatch: Colors.blue,
-        textTheme: FitnessAppTheme.textTheme,
+        accentColor: Color(0xFF3e0c66),
+        textTheme: AppTheme.textTheme,
         platform: TargetPlatform.iOS,
       ),
       onGenerateRoute: Router.generateRoute,

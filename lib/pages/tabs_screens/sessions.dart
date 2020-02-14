@@ -4,53 +4,51 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
-import 'package:msp/models/event.dart';
 import 'package:msp/models/session.dart';
-import 'package:msp/pages/tabs_screens/items_widgets/event_item.dart';
 import 'package:msp/pages/tabs_screens/items_widgets/session_item.dart';
 import 'package:msp/ui/app_theme.dart';
 
 import '../../main.dart';
 
-const String url = "https://msp-app-dashboard.herokuapp.com/api/courses";
+const String _url = "https://msp-app-dashboard.herokuapp.com/api/courses";
 
 class SessionsScreen extends StatefulWidget {
   final AnimationController animationController;
-  
+
   const SessionsScreen({Key key, this.animationController}) : super(key: key);
-  
+
   @override
   _SessionsScreenState createState() => _SessionsScreenState();
 }
 
 class _SessionsScreenState extends State<SessionsScreen>
-  with TickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final StreamController<double> _streamController = StreamController<double>();
-  
+
   List<Session> sessions = new List<Session>();
-  
+
   Animation<double> topBarAnimation;
   Animation<double> animation;
-  
+
   final ScrollController scrollController = ScrollController();
   double topBarOpacity = 0.0;
-  
+
   @override
   void initState() {
-    getEvents();
-    
+    _getSessions();
+
     topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: widget.animationController,
-        curve: Interval(0, 0.5, curve: Curves.fastOutSlowIn)));
-    
+        CurvedAnimation(
+            parent: widget.animationController,
+            curve: Interval(0, 0.5, curve: Curves.fastOutSlowIn)));
+
     scrollController.addListener(() {
       if (scrollController.offset >= 24) {
         if (topBarOpacity != 1.0) {
           _streamController.sink.add(1.0);
         }
       } else if (scrollController.offset <= 24 &&
-                 scrollController.offset >= 0) {
+          scrollController.offset >= 0) {
         if (topBarOpacity != scrollController.offset / 24) {
           _streamController.sink.add(scrollController.offset / 24);
         }
@@ -60,20 +58,20 @@ class _SessionsScreenState extends State<SessionsScreen>
         }
       }
     });
-    
+
     super.initState();
   }
-  
+
   @override
   void dispose() {
     _streamController.close();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: FitnessAppTheme.background,
+      color: AppTheme.background,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -88,10 +86,10 @@ class _SessionsScreenState extends State<SessionsScreen>
       ),
     );
   }
-  
+
   Widget getMainListViewUI() {
     return FutureBuilder(
-      future: http.get(url),
+      future: http.get(_url),
       builder: (BuildContext context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
@@ -99,7 +97,7 @@ class _SessionsScreenState extends State<SessionsScreen>
               child: SpinKitPulse(
                 size: 100,
                 duration: Duration(seconds: 2),
-                color: FitnessAppTheme.nearlyBlue.withOpacity(0.5),
+                color: HexColor('#6441A5').withOpacity(0.5),
               ),
             );
           default:
@@ -110,15 +108,19 @@ class _SessionsScreenState extends State<SessionsScreen>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Image.asset("assets/images/EmptyState.png",
-                      height: 250, width: 250),
-                    Text(
-                      "No Sessions Yet".toUpperCase(),
-                      style: TextStyle(
-                        fontFamily: "Roboto",
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        letterSpacing: 0.2,
-                        color: AppTheme.nearlyBlack.withOpacity(0.8)),
+                      height: 150, width: 250, fit: BoxFit.scaleDown,),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "No Sessions Yet".toUpperCase(),
+                        style: TextStyle(
+                          fontFamily: "Roboto",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          letterSpacing: 0.2,
+                          color:AppTheme.nearlyBlack
+                            .withOpacity(0.8)),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -130,7 +132,8 @@ class _SessionsScreenState extends State<SessionsScreen>
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                           letterSpacing: 0.2,
-                          color: AppTheme.nearlyBlack.withOpacity(0.6)),
+                          color:AppTheme.nearlyBlack
+                            .withOpacity(0.6)),
                       ),
                     )
                   ],
@@ -144,16 +147,16 @@ class _SessionsScreenState extends State<SessionsScreen>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Image.asset("assets/images/NoInternetState.png",
-                      height: 250, width: 250),
+                        height: 250, width: 250),
                     Text(
                       "No internet connection\nPlease check your internet\nconnection",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: "Roboto",
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        letterSpacing: 0.2,
-                        color: AppTheme.nearlyBlack.withOpacity(0.6)),
+                          fontFamily: "Roboto",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          letterSpacing: 0.2,
+                          color:AppTheme.nearlyBlack.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -166,24 +169,25 @@ class _SessionsScreenState extends State<SessionsScreen>
                     controller: scrollController,
                     padding: EdgeInsets.only(
                       top: AppBar().preferredSize.height +
-                           MediaQuery.of(context).padding.top +
-                           24,
+                          MediaQuery.of(context).padding.top +
+                          24,
                       bottom: 62 + MediaQuery.of(context).padding.bottom,
                     ),
                     itemCount: sessions.length,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext context, int index) {
                       animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-                        CurvedAnimation(
-                          parent: widget.animationController,
-                          curve: Interval((1 / sessions.length) * index, 1.0,
-                            curve: Curves.fastOutSlowIn)));
-                      
-                      var event = sessions[index];
+                          CurvedAnimation(
+                              parent: widget.animationController,
+                              curve: Interval(
+                                  (1 / sessions.length) * index, 1.0,
+                                  curve: Curves.fastOutSlowIn)));
+
+                      Session session = sessions[index];
                       widget.animationController.forward();
-                      
+
                       return SessionItem(
-                        event, animation, widget.animationController);
+                          session, animation, widget.animationController);
                     },
                   ),
                 ),
@@ -192,7 +196,7 @@ class _SessionsScreenState extends State<SessionsScreen>
       },
     );
   }
-  
+
   Widget getAppBarUI() {
     return StreamBuilder<double>(
       stream: _streamController.stream,
@@ -207,19 +211,19 @@ class _SessionsScreenState extends State<SessionsScreen>
                   opacity: topBarAnimation,
                   child: Transform(
                     transform: Matrix4.translationValues(
-                      0.0, 30 * (1.0 - topBarAnimation.value), 0.0),
+                        0.0, 30 * (1.0 - topBarAnimation.value), 0.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: FitnessAppTheme.white.withOpacity(snapshot.data),
+                        color: AppTheme.white.withOpacity(snapshot.data),
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(32.0),
                         ),
                         boxShadow: <BoxShadow>[
                           BoxShadow(
-                            color: FitnessAppTheme.grey
-                              .withOpacity(0.4 * snapshot.data),
-                            offset: const Offset(1.1, 1.1),
-                            blurRadius: 10.0),
+                              color: AppTheme.grey
+                                  .withOpacity(0.4 * snapshot.data),
+                              offset: const Offset(1.1, 1.1),
+                              blurRadius: 10.0),
                         ],
                       ),
                       child: Column(
@@ -229,10 +233,10 @@ class _SessionsScreenState extends State<SessionsScreen>
                           ),
                           Padding(
                             padding: EdgeInsets.only(
-                              left: 16,
-                              right: 16,
-                              top: 16 - 8.0 * snapshot.data,
-                              bottom: 12 - 8.0 * snapshot.data),
+                                left: 16,
+                                right: 16,
+                                top: 16 - 8.0 * snapshot.data,
+                                bottom: 12 - 8.0 * snapshot.data),
                             child: Container(
                               width: MediaQuery.of(context).size.width,
                               padding: const EdgeInsets.all(8.0),
@@ -240,11 +244,11 @@ class _SessionsScreenState extends State<SessionsScreen>
                                 'Sessions',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
-                                  fontFamily: FitnessAppTheme.fontName,
+                                  fontFamily: AppTheme.fontName,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 22 + 6 - 6 * snapshot.data,
                                   letterSpacing: 1.2,
-                                  color: FitnessAppTheme.darkerText,
+                                  color: AppTheme.darkerText,
                                 ),
                               ),
                             ),
@@ -261,9 +265,9 @@ class _SessionsScreenState extends State<SessionsScreen>
       },
     );
   }
-  
-  Future getEvents() async {
-    await API.getData(url).then((response) {
+
+  Future _getSessions() async {
+    await API.getData(_url).then((response) {
       setState(() {
         Iterable list = json.decode(response.body);
         sessions = list.map((model) => Session.fromJson(model)).toList();
