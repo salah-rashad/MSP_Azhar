@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:auto_direction/auto_direction.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' as Intl;
 import 'package:msp/models/event.dart';
 import 'package:msp/pages/home.dart';
@@ -11,33 +13,71 @@ import 'package:msp/ui/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 //List<Widget> texts = <Widget>[];
+Event _event;
 
-class FullEventScreen extends StatelessWidget {
+class DetailedEventScreen extends StatefulWidget {
   final Event event;
   final String location;
 
-  const FullEventScreen(this.event, this.location);
+  const DetailedEventScreen(this.event, this.location);
 
+  @override
+  _DetailedEventScreenState createState() => _DetailedEventScreenState();
+}
+
+class _DetailedEventScreenState extends State<DetailedEventScreen> {
+  
+  @override
+  void initState() {
+    _event = widget.event;
+    super.initState();
+  }
+  
+  @override
+  void dispose() {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness:
+      Platform.isAndroid ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarDividerColor: Colors.grey,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ));
+    
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-
+    
     return Scaffold(
         appBar: AppBar(
-          iconTheme: IconThemeData(color: AppTheme.nearlyBlack),
-          brightness: Brightness.light,
-          title: Text(event.title, style: FitnessAppTheme.title),
-          backgroundColor: FitnessAppTheme.nearlyWhite,
+          iconTheme: IconThemeData(color: AppTheme.nearlyWhite),
+          brightness: Brightness.dark,
+          title: Text(_event.title,
+              style: AppTheme.title
+                  .apply(color: AppTheme.nearlyWhite)),
+          backgroundColor: AppTheme.nearlyDarkBlue,
         ),
         floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: FitnessAppTheme.nearlyDarkBlue,
-          onPressed: () => launchURL(event.formLink),
+          backgroundColor: AppTheme.nearlyDarkBlue,
+          onPressed: () => launchURL(_event.formLink),
           label: Text("Enroll Now".toUpperCase()),
         ),
         body: ListView(
           padding: EdgeInsets.only(bottom: 60),
           children: <Widget>[
-            Container(child: getImageFromAPI(event.img, 200, size.width)),
+            Container(
+              height: 200,
+              width: size.width,
+              child: _event.img.isNotEmpty ? Image.memory(
+                getImageFromAPI(_event.img),
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ): Container(color: AppTheme.tab3Secondary,),
+            ),
             SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -65,13 +105,14 @@ class FullEventScreen extends StatelessWidget {
                         width: 130,
                         child: Text(
                           "Date & Time:".toUpperCase(),
-                          style: FitnessAppTheme.title,
+                          style: AppTheme.title
+                              .apply(color: AppTheme.nearlyDarkBlue),
                         ),
                       ),
                       Flexible(
                         child: Text(
-                          getDateTime(event.date, event.time),
-                          style: FitnessAppTheme.subtitle,
+                          getDateTime(_event.date, _event.time),
+                          style: AppTheme.subtitle,
                         ),
                       ),
                     ],
@@ -84,16 +125,17 @@ class FullEventScreen extends StatelessWidget {
                         width: 130,
                         child: Text(
                           "Location:".toUpperCase(),
-                          style: FitnessAppTheme.title,
+                          style: AppTheme.title
+                              .apply(color: AppTheme.nearlyDarkBlue),
                         ),
                       ),
                       Flexible(
                         child: InkWell(
-                          onTap: () => launchURL(event.location),
+                          onTap: () => launchURL(_event.location),
                           child: Text(
-                            location,
+                            widget.location,
                             style: TextStyle(
-                                color: FitnessAppTheme.nearlyBlue2,
+                                color: AppTheme.nearlyBlue2,
                                 decoration: TextDecoration.underline,
                                 decorationThickness: 0.3),
                           ),
@@ -108,21 +150,22 @@ class FullEventScreen extends StatelessWidget {
                         width: 130,
                         child: Text(
                           "Fees:".toUpperCase(),
-                          style: FitnessAppTheme.title,
+                          style: AppTheme.title
+                              .apply(color: AppTheme.nearlyDarkBlue),
                         ),
                       ),
                       Flexible(
                         child: Text(
-                          event.price.contains(new RegExp('[A-Z]'))
-                              ? event.price
-                              : event.price + " EGP",
-                          style: FitnessAppTheme.subtitle,
+                          _event.price.contains(new RegExp('[A-Z]'))
+                              ? _event.price
+                              : _event.price + " EGP",
+                          style: AppTheme.subtitle,
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 8),
-                  event.topics.isEmpty
+                  _event.topics.isEmpty
                       ? Container()
                       : ExpandablePanel(
                           initialExpanded: false,
@@ -131,17 +174,20 @@ class FullEventScreen extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                "Topics:".toUpperCase(),
-                                style: FitnessAppTheme.title,
+                                "Topics".toUpperCase(),
+                                style: AppTheme.title.apply(
+                                    color: AppTheme.nearlyDarkBlue),
                               ),
                             ),
                           ),
                           expanded: Container(
                             height: 200,
                             child: ListView.builder(
-                                itemCount: event.topics.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return TopicItem(event.topics[index], index);
+                                itemCount: _event.topics.length,
+                                itemBuilder:
+                                    (BuildContext context, int index) {
+                                  return TopicItem(
+                                      _event.topics[index], index);
                                 }),
                           ),
                           tapHeaderToExpand: true,
@@ -156,16 +202,23 @@ class FullEventScreen extends StatelessWidget {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Description:".toUpperCase(),
-                          style: FitnessAppTheme.title,
+                          "Description".toUpperCase(),
+                          style: AppTheme.title
+                              .apply(color: AppTheme.nearlyDarkBlue),
                         ),
                       ),
                     ),
                     expanded: AutoDirection(
-                      text: event.description,
-                      child: Text(
-                        event.description,
-                        style: FitnessAppTheme.subtitle,
+                      text: _event.description,
+                      child: Row(
+                        children: <Widget>[
+                          Flexible(
+                            child: Text(
+                              _event.description,
+                              style: AppTheme.subtitle,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     tapHeaderToExpand: true,
