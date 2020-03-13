@@ -32,7 +32,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     tabIconsList[0].isSelected = true;
 
     animationController = AnimationController(
-        duration: const Duration(milliseconds: 600), vsync: this);
+        duration: const Duration(milliseconds: 800), vsync: this);
     tabBody = EventsScreen(animationController: animationController);
     super.initState();
   }

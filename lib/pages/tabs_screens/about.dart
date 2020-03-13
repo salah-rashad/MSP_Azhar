@@ -177,8 +177,8 @@ class _AboutScreenState extends State<AboutScreen>
                   animation = Tween<double>(begin: 0.0, end: 1.0).animate(
                       CurvedAnimation(
                           parent: widget.animationController,
-                          curve:
-                              Interval(0.2, 1.0, curve: Curves.fastOutSlowIn)));
+                          curve: Interval(0.25, 1.0,
+                              curve: Curves.fastOutSlowIn)));
 
                   return FadeTransition(
                       opacity: animation,
@@ -210,7 +210,8 @@ class _AboutScreenState extends State<AboutScreen>
                                   color: AppTheme.nearlyWhite,
                                   iconSize: 18,
                                   icon: Icon(FontAwesomeIcons.youtube),
-                                  onPressed: () => launchURL("https://www.youtube.com/channel/UCnrCvhZJDpijR61BNo0rk9Q"),
+                                  onPressed: () => launchURL(
+                                      "https://www.youtube.com/channel/UCnrCvhZJDpijR61BNo0rk9Q"),
                                 ),
                               ),
                             ),
@@ -284,7 +285,8 @@ class _AboutScreenState extends State<AboutScreen>
                                   color: AppTheme.nearlyWhite,
                                   iconSize: 20,
                                   icon: Icon(FontAwesomeIcons.instagram),
-                                  onPressed: () => launchURL("https://www.instagram.com/mspalazhar/"),
+                                  onPressed: () => launchURL(
+                                      "https://www.instagram.com/mspalazhar/"),
                                 ),
                               ),
                             ),
@@ -338,7 +340,7 @@ class _AboutScreenState extends State<AboutScreen>
                         animation = Tween<double>(begin: 0.0, end: 1.0).animate(
                             CurvedAnimation(
                                 parent: widget.animationController,
-                                curve: Interval(0.4, 1.0,
+                                curve: Interval(0.375, 1.0,
                                     curve: Curves.fastOutSlowIn)));
                         return FadeTransition(
                           opacity: animation,
@@ -388,7 +390,7 @@ class _AboutScreenState extends State<AboutScreen>
                         animation = Tween<double>(begin: 0.0, end: 1.0).animate(
                             CurvedAnimation(
                                 parent: widget.animationController,
-                                curve: Interval(0.6, 1.0,
+                                curve: Interval(0.5, 1.0,
                                     curve: Curves.fastOutSlowIn)));
 
                         return FadeTransition(
@@ -440,7 +442,7 @@ class _AboutScreenState extends State<AboutScreen>
                         animation = Tween<double>(begin: 0.0, end: 1.0).animate(
                             CurvedAnimation(
                                 parent: widget.animationController,
-                                curve: Interval(0.8, 1.0,
+                                curve: Interval(0.625, 1.0,
                                     curve: Curves.fastOutSlowIn)));
 
                         return FadeTransition(
@@ -490,14 +492,14 @@ class _AboutScreenState extends State<AboutScreen>
                       animation = Tween<double>(begin: 0.0, end: 1.0).animate(
                           CurvedAnimation(
                               parent: widget.animationController,
-                              curve: Interval(0.9, 1.0,
+                              curve: Interval(0.75, 1.0,
                                   curve: Curves.fastOutSlowIn)));
 
                       return FadeTransition(
                         opacity: animation,
                         child: new Transform(
                           transform: new Matrix4.translationValues(
-                              0.0, 30 * (1.0 - animation.value), 0.0),
+                              0.0, 50 * (1.0 - animation.value), 0.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
