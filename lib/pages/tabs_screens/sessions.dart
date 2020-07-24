@@ -6,16 +6,20 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:msp/models/session.dart';
 import 'package:msp/pages/tabs_screens/items_widgets/session_item.dart';
+import 'package:msp/services/api_services.dart';
 import 'package:msp/ui/app_theme.dart';
 
-import '../../main.dart';
-
-const String _url = "https://msp-app-dashboard.herokuapp.com/api/courses";
+String _url = "https://msp-app-dashboard.herokuapp.com/api/courses";
 
 class SessionsScreen extends StatefulWidget {
   final AnimationController animationController;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const SessionsScreen({Key key, this.animationController}) : super(key: key);
+  const SessionsScreen({
+    Key key,
+    @required this.animationController,
+    @required this.scaffoldKey,
+  }) : super(key: key);
 
   @override
   _SessionsScreenState createState() => _SessionsScreenState();
@@ -25,7 +29,7 @@ class _SessionsScreenState extends State<SessionsScreen>
     with TickerProviderStateMixin {
   final StreamController<double> _streamController = StreamController<double>();
 
-  List<Session> sessions = new List<Session>();
+  Future<List<Session>> sessions;
 
   Animation<double> topBarAnimation;
   Animation<double> animation;
@@ -35,7 +39,7 @@ class _SessionsScreenState extends State<SessionsScreen>
 
   @override
   void initState() {
-    _getSessions();
+    sessions = API?.getSessions(_url);
 
     topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
@@ -89,37 +93,44 @@ class _SessionsScreenState extends State<SessionsScreen>
 
   Widget getMainListViewUI() {
     return FutureBuilder(
-      future: http.get(_url),
+      future: API?.getSessions(_url),
       builder: (BuildContext context, snapshot) {
+        
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return new Center(
               child: SpinKitPulse(
                 size: 100,
                 duration: Duration(seconds: 2),
-                color: HexColor('#6441A5').withOpacity(0.5),
+                color: AppTheme.tab2Secondary.withOpacity(0.5),
               ),
             );
           default:
+          List<Session> sessions = snapshot.data;
+          print(sessions.toString());
+          
             if (!snapshot.hasError && sessions.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset("assets/images/EmptyState.png",
-                      height: 150, width: 250, fit: BoxFit.scaleDown,),
+                    Image.asset(
+                      "assets/images/EmptyState.png",
+                      height: 150,
+                      width: 250,
+                      fit: BoxFit.scaleDown,
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         "No Sessions Yet".toUpperCase(),
                         style: TextStyle(
-                          fontFamily: "Roboto",
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          letterSpacing: 0.2,
-                          color:AppTheme.nearlyBlack
-                            .withOpacity(0.8)),
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            letterSpacing: 0.2,
+                            color: AppTheme.nearlyBlack.withOpacity(0.8)),
                       ),
                     ),
                     Padding(
@@ -128,12 +139,11 @@ class _SessionsScreenState extends State<SessionsScreen>
                         "Stay connected, we may have \nsome sessions soon!",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: "Roboto",
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          letterSpacing: 0.2,
-                          color:AppTheme.nearlyBlack
-                            .withOpacity(0.6)),
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            letterSpacing: 0.2,
+                            color: AppTheme.nearlyBlack.withOpacity(0.6)),
                       ),
                     )
                   ],
@@ -156,7 +166,7 @@ class _SessionsScreenState extends State<SessionsScreen>
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                           letterSpacing: 0.2,
-                          color:AppTheme.nearlyBlack.withOpacity(0.6)),
+                          color: AppTheme.nearlyBlack.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -186,8 +196,8 @@ class _SessionsScreenState extends State<SessionsScreen>
                       Session session = sessions[index];
                       widget.animationController.forward();
 
-                      return SessionItem(
-                          session, animation, widget.animationController);
+                      return SessionItem(session, animation,
+                          widget.animationController, widget.scaffoldKey);
                     },
                   ),
                 ),
@@ -264,14 +274,5 @@ class _SessionsScreenState extends State<SessionsScreen>
         );
       },
     );
-  }
-
-  Future _getSessions() async {
-    await API.getData(_url).then((response) {
-      setState(() {
-        Iterable list = json.decode(response.body);
-        sessions = list.map((model) => Session.fromJson(model)).toList();
-      });
-    });
   }
 }

@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as http;
 import 'package:msp/models/project.dart';
 import 'package:msp/pages/tabs_screens/items_widgets/project_item.dart';
+import 'package:msp/services/api_services.dart';
 import 'package:msp/ui/app_theme.dart';
 
-import '../../main.dart';
+String _url = "https://msp-app-dashboard.herokuapp.com/api/projects/";
 
 class ProjectsScreen extends StatefulWidget {
   final AnimationController animationController;
@@ -21,10 +20,9 @@ class ProjectsScreen extends StatefulWidget {
 
 class _ProjectsScreenState extends State<ProjectsScreen>
     with TickerProviderStateMixin {
-  String _category = "mobile";
-  String _url = "https://msp-app-dashboard.herokuapp.com/api/projects/";
+  String category = "mobile";
 
-  List<Project> projects = new List<Project>();
+  Future<List<Project>> projects;
 
   final StreamController<double> _topBarStreamController =
       StreamController<double>();
@@ -45,7 +43,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
 
   @override
   void initState() {
-    _getProjects();
+    projects = API?.getProjects(_url, category);
 
     topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
@@ -146,9 +144,11 @@ class _ProjectsScreenState extends State<ProjectsScreen>
         const SizedBox(height: 16),
         Container(
           height: MediaQuery.of(context).size.height - 228,
-          child: FutureBuilder(
-              future: http.get(_url + _category),
+          child: FutureBuilder<List<Project>>(
+              future: projects,
               builder: (context, snapshot) {
+                List<Project> projects = snapshot.data;
+
                 if (snapshot.connectionState != ConnectionState.done) {
                   return new Center(
                     child: SpinKitPulse(
@@ -175,7 +175,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16,
                                   letterSpacing: 0.2,
-                                  color:AppTheme.nearlyBlack.withOpacity(0.8)),
+                                  color: AppTheme.nearlyBlack.withOpacity(0.8)),
                             ),
                           ),
                           Padding(
@@ -188,7 +188,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16,
                                   letterSpacing: 0.2,
-                                  color:AppTheme.nearlyBlack.withOpacity(0.6)),
+                                  color: AppTheme.nearlyBlack.withOpacity(0.6)),
                             ),
                           )
                         ],
@@ -213,7 +213,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16,
                                   letterSpacing: 0.2,
-                                  color:AppTheme.nearlyBlack.withOpacity(0.6)),
+                                  color: AppTheme.nearlyBlack.withOpacity(0.6)),
                             ),
                           )
                         ],
@@ -234,8 +234,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                               animation = Tween<double>(begin: 0.0, end: 1.0)
                                   .animate(CurvedAnimation(
                                       parent: widget.animationController,
-                                      curve: Interval(
-                                          0.5, 1.0,
+                                      curve: Interval(0.5, 1.0,
                                           curve: Curves.fastOutSlowIn)));
 
                               widget.animationController.forward();
@@ -292,33 +291,33 @@ class _ProjectsScreenState extends State<ProjectsScreen>
 
               if (categoryType == CategoryType.mobile) {
                 setState(() {
-                  _category = 'mobile';
-                  projects.clear();
-                  _getProjects();
+                  category = 'mobile';
+
+                  projects = API.getProjects(_url, category);
                 });
               } else if (categoryType == CategoryType.web) {
                 setState(() {
-                  _category = 'web';
-                  projects.clear();
-                  _getProjects();
+                  category = 'web';
+
+                  projects = API.getProjects(_url, category);
                 });
               } else if (categoryType == CategoryType.media) {
                 setState(() {
-                  _category = 'media';
-                  projects.clear();
-                  _getProjects();
+                  category = 'media';
+
+                  projects = API.getProjects(_url, category);
                 });
               } else if (categoryType == CategoryType.it) {
                 setState(() {
-                  _category = 'it';
-                  projects.clear();
-                  _getProjects();
+                  category = 'it';
+
+                  projects = API.getProjects(_url, category);
                 });
               } else if (categoryType == CategoryType.autonomous) {
                 setState(() {
-                  _category = 'autonomous';
-                  projects.clear();
-                  _getProjects();
+                  category = 'autonomous';
+
+                  projects = API.getProjects(_url, category);
                 });
               }
             });
@@ -413,15 +412,6 @@ class _ProjectsScreenState extends State<ProjectsScreen>
         );
       },
     );
-  }
-
-  Future _getProjects() async {
-    await API.getData(_url + _category).then((response) {
-      setState(() {
-        Iterable list = json.decode(response.body);
-        projects = list.map((model) => Project.fromJson(model)).toList();
-      });
-    });
   }
 }
 

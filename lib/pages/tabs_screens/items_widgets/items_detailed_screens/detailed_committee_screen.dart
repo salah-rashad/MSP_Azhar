@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auto_direction/auto_direction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart' as Intl;
 import 'package:msp/models/committee.dart';
 import 'package:msp/models/project.dart';
@@ -28,12 +29,12 @@ class _DetailedCommitteeScreenState extends State<DetailedCommitteeScreen> {
   @override
   void initState() {
     _committee = widget.committee;
-    
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       statusBarBrightness:
-          Platform.isAndroid ? Brightness.light: Brightness.light,
+          Platform.isAndroid ? Brightness.light : Brightness.light,
       systemNavigationBarColor: Colors.white,
       systemNavigationBarDividerColor: Colors.grey,
       systemNavigationBarIconBrightness: Brightness.light,
@@ -91,8 +92,8 @@ class _DetailedCommitteeScreenState extends State<DetailedCommitteeScreen> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(22.0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
               child: Column(
                 children: <Widget>[
                   Row(
@@ -100,7 +101,6 @@ class _DetailedCommitteeScreenState extends State<DetailedCommitteeScreen> {
                     children: <Widget>[
                       Hero(
                         tag: "/TitleTag/${_committee.id}",
-                        
                         child: Material(
                           color: Colors.transparent,
                           child: Text(
@@ -124,20 +124,19 @@ class _DetailedCommitteeScreenState extends State<DetailedCommitteeScreen> {
                   SizedBox(
                     height: 16,
                   ),
-                  Row(
-                    children: <Widget>[
-                      Flexible(
-                        child: Text(
-                          _committee.description,
-                          style: TextStyle(
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                              letterSpacing: 0.2,
-                              color: AppTheme.nearlyWhite.withOpacity(0.8)),
-                        ),
+                  Expanded(
+                                    child: Markdown(
+                      data: _committee.description,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.all(0.0),
+                      styleSheet: MarkdownStyleSheet(
+                        
+                        p: TextStyle(color: AppTheme.white, fontSize: 16.0),
+                        listBullet: TextStyle(
+                            color: AppTheme.nearlyWhite, fontSize: 16.0),
+                        
                       ),
-                    ],
+                    ),
                   )
                 ],
               ),
@@ -149,6 +148,15 @@ class _DetailedCommitteeScreenState extends State<DetailedCommitteeScreen> {
   }
 }
 
+// Text(
+//   _committee.description,
+//   style: TextStyle(
+//       fontFamily: "Roboto",
+//       fontWeight: FontWeight.w400,
+//       fontSize: 16,
+//       letterSpacing: 0.2,
+//       color: AppTheme.nearlyWhite.withOpacity(0.8)),
+// ),
 getDateTime(String date, String time) {
   return Intl.DateFormat("dd/MM/yyyy - hh:mm a").format(
     DateTime.parse("$date $time"),

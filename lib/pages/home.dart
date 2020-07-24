@@ -20,6 +20,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   List<TabIconData> tabIconsList = TabIconData.tabIconsList;
 
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
   Widget tabBody = Container(
     color: AppTheme.background,
   );
@@ -46,6 +48,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       body: Container(
         color: AppTheme.background,
         child: Scaffold(
@@ -96,8 +99,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   return;
                 }
                 setState(() {
-                  tabBody =
-                      SessionsScreen(animationController: animationController);
+                  tabBody = SessionsScreen(
+                    animationController: animationController,
+                    scaffoldKey: scaffoldKey,
+                  );
                 });
               });
             } else if (index == 2) {
@@ -106,7 +111,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   return;
                 }
                 setState(() {
-                  tabBody = ProjectsScreen(animationController: animationController);
+                  tabBody =
+                      ProjectsScreen(animationController: animationController);
                 });
               });
             } else if (index == 3) {
@@ -115,7 +121,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   return;
                 }
                 setState(() {
-                  tabBody = AboutScreen(animationController: animationController);
+                  tabBody =
+                      AboutScreen(animationController: animationController);
                 });
               });
             }
@@ -132,9 +139,8 @@ Future<bool> getData() async {
 }
 
 Uint8List getImageFromAPI(String image) {
-  
-    var img = image
-        .replaceAll("data:image/jpeg;base64,", "")
-        .replaceAll("data:image/png;base64,", "");
-    return base64.decode(img);
+  var img = image
+      .replaceAll("data:image/jpeg;base64,", "")
+      .replaceAll("data:image/png;base64,", "");
+  return base64.decode(img);
 }

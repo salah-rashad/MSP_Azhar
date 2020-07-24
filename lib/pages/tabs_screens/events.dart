@@ -1,16 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as http;
 import 'package:msp/models/event.dart';
 import 'package:msp/pages/tabs_screens/items_widgets/event_item.dart';
+import 'package:msp/services/api_services.dart';
 import 'package:msp/ui/app_theme.dart';
 
-import '../../main.dart';
-
-const String url = "https://msp-app-dashboard.herokuapp.com/api/events";
+String _url = "https://msp-app-dashboard.herokuapp.com/api/events";
 
 class EventsScreen extends StatefulWidget {
   final AnimationController animationController;
@@ -25,7 +22,7 @@ class _EventsScreenState extends State<EventsScreen>
     with TickerProviderStateMixin {
   final StreamController<double> _streamController = StreamController<double>();
 
-  List<Event> events = new List<Event>();
+  Future<List<Event>> events;
 
   Animation<double> topBarAnimation;
   Animation<double> animation;
@@ -35,7 +32,7 @@ class _EventsScreenState extends State<EventsScreen>
 
   @override
   void initState() {
-    getEvents();
+    events = API?.getEvents(_url);
 
     topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
@@ -88,9 +85,11 @@ class _EventsScreenState extends State<EventsScreen>
   }
 
   Widget getMainListViewUI() {
-    return FutureBuilder(
-      future: http.get(url),
+    return FutureBuilder<List<Event>>(
+      future: events,
       builder: (BuildContext context, snapshot) {
+        List<Event> events = snapshot.data;
+
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return new Center(
@@ -107,8 +106,12 @@ class _EventsScreenState extends State<EventsScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset("assets/images/EmptyState.png",
-                        height: 150, width: 250, fit: BoxFit.scaleDown,),
+                    Image.asset(
+                      "assets/images/EmptyState.png",
+                      height: 150,
+                      width: 250,
+                      fit: BoxFit.scaleDown,
+                    ),
                     Text(
                       "No Events Yet".toUpperCase(),
                       style: TextStyle(
@@ -116,7 +119,7 @@ class _EventsScreenState extends State<EventsScreen>
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                           letterSpacing: 0.2,
-                          color:AppTheme.nearlyBlack.withOpacity(0.8)),
+                          color: AppTheme.nearlyBlack.withOpacity(0.8)),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -128,7 +131,7 @@ class _EventsScreenState extends State<EventsScreen>
                             fontWeight: FontWeight.w400,
                             fontSize: 16,
                             letterSpacing: 0.2,
-                            color:AppTheme.nearlyBlack.withOpacity(0.6)),
+                            color: AppTheme.nearlyBlack.withOpacity(0.6)),
                       ),
                     )
                   ],
@@ -151,7 +154,7 @@ class _EventsScreenState extends State<EventsScreen>
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
                           letterSpacing: 0.2,
-                          color:AppTheme.nearlyBlack.withOpacity(0.6)),
+                          color: AppTheme.nearlyBlack.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -258,20 +261,5 @@ class _EventsScreenState extends State<EventsScreen>
         );
       },
     );
-  }
-
-  Future getEvents() async {
-    await API.getData(url).then((response) {
-      setState(() {
-        Iterable list = json.decode(response.body);
-        List<Event> list2 = list.map((model) => Event.fromJson(model)).toList();
-        list2.sort((a,b) {
-          var aDate = DateTime.parse(a.date);
-          var bDate = DateTime.parse(b.date);
-          return bDate.compareTo(aDate);
-        });
-        events = list2;
-      });
-    });
   }
 }

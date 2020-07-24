@@ -66,7 +66,7 @@ class CommitteeItem extends StatelessWidget {
               gradient: new LinearGradient(
                 colors: [
                   Colors.transparent,
-                  HexColor("#000000").withOpacity(0.6),
+                  AppTheme.nearlyBlack.withOpacity(0.6),
                 ],
                 stops: [0.5, 1.0],
                 begin: Alignment.topCenter,

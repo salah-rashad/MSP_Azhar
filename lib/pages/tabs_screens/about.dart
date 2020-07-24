@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:msp/models/committee.dart';
 import 'package:msp/pages/tabs_screens/items_widgets/committee_item.dart';
+import 'package:msp/services/open_url.dart';
 import 'package:msp/ui/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -210,7 +210,7 @@ class _AboutScreenState extends State<AboutScreen>
                                   color: AppTheme.nearlyWhite,
                                   iconSize: 18,
                                   icon: Icon(FontAwesomeIcons.youtube),
-                                  onPressed: () => launchURL(
+                                  onPressed: () => openURL(
                                       "https://www.youtube.com/channel/UCnrCvhZJDpijR61BNo0rk9Q"),
                                 ),
                               ),
@@ -285,7 +285,7 @@ class _AboutScreenState extends State<AboutScreen>
                                   color: AppTheme.nearlyWhite,
                                   iconSize: 20,
                                   icon: Icon(FontAwesomeIcons.instagram),
-                                  onPressed: () => launchURL(
+                                  onPressed: () => openURL(
                                       "https://www.instagram.com/mspalazhar/"),
                                 ),
                               ),
@@ -314,7 +314,8 @@ class _AboutScreenState extends State<AboutScreen>
                                   color: AppTheme.nearlyWhite,
                                   iconSize: 18,
                                   icon: Icon(FontAwesomeIcons.linkedinIn),
-                                  onPressed: () {},
+                                  onPressed: () => openURL(
+                                      "https://www.linkedin.com/company/msp-tech-club-al-azhar-university/"),
                                 ),
                               ),
                             ),
@@ -668,11 +669,4 @@ class Painter extends CustomPainter {
   }
 }
 
-launchURL(String url) async {
-  String mUrl = url;
-  if (await canLaunch(mUrl)) {
-    await launch(mUrl);
-  } else {
-    throw 'Could not launch $mUrl';
-  }
-}
+

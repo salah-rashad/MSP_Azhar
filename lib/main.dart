@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:msp/pages/home.dart';
-import 'package:http/http.dart' as http;
 import 'package:msp/utils/constants.dart';
 import 'package:msp/utils/router.dart';
 
@@ -14,12 +13,12 @@ void main() {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
     statusBarBrightness:
-    Platform.isAndroid ? Brightness.dark : Brightness.light,
+        Platform.isAndroid ? Brightness.dark : Brightness.light,
     systemNavigationBarColor: Colors.white,
     systemNavigationBarDividerColor: Colors.grey,
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
-  
+
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
@@ -31,38 +30,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "MSP Azhar",
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: Colors.blue,
-        accentColor: Color(0xFF3e0c66),
-        textTheme: AppTheme.textTheme,
-        platform: TargetPlatform.iOS,
-      ),
-      onGenerateRoute: Router.generateRoute,
-      initialRoute: homeRoute,
-      home: Home()
-    );
-  }
-}
-
-class HexColor extends Color {
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
-
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll('#', '');
-    if (hexColor.length == 6) {
-      hexColor = 'FF' + hexColor;
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-}
-
-class API {
-  static Future getData(String url) {
-    return http.get(url);
+        debugShowCheckedModeBanner: false,
+        title: "MSP Azhar",
+        theme: ThemeData(
+          brightness: Brightness.light,
+          textTheme: AppTheme.textTheme,
+          platform: TargetPlatform.iOS,
+        ),
+        onGenerateRoute: Router.generateRoute,
+        initialRoute: homeRoute,
+        home: Home());
   }
 }

@@ -52,8 +52,8 @@ class StaffItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.0),
             gradient: new LinearGradient(
               colors: [
-                HexColor("#000000").withOpacity(0.0),
-                HexColor("#000000").withOpacity(0.8),
+                AppTheme.nearlyBlack.withOpacity(0.0),
+                AppTheme.nearlyBlack.withOpacity(0.8),
               ],
               stops: [0.5, 1.0],
               begin: Alignment.topCenter,

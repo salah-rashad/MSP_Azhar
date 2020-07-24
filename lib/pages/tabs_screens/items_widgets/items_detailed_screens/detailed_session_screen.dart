@@ -1,19 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as http;
 import 'package:msp/models/playlist.dart';
 import 'package:msp/models/session.dart';
+import 'package:msp/services/api_services.dart';
 import 'package:msp/ui/app_theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
-Session _session;
-
-YoutubePlayerController _controller;
 
 class DetailedSessionScreen extends StatefulWidget {
   final Session session;
@@ -25,14 +20,17 @@ class DetailedSessionScreen extends StatefulWidget {
 }
 
 class _DetailedSessionScreenState extends State<DetailedSessionScreen> {
-  Future<PlayList> _playlist;
+  Future<PlayList> playlist;
+  YoutubePlayerController _controller;
 
   final StreamController<String> _streamController = StreamController<String>();
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    _session = widget.session;
-    _playlist = fetchPlaylist().catchError((e) => print(e));
+    playlist = API
+        ?.fetchPlaylist(widget.session, scaffoldKey)
+        ?.catchError((e) => print(e));
 
     super.initState();
   }
@@ -64,17 +62,17 @@ class _DetailedSessionScreenState extends State<DetailedSessionScreen> {
         ]);
       }
       return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: AppTheme.tab2Primary,
-          title: Text(_session.name),
+          title: Text(widget.session.name),
           elevation: 10,
         ),
         body: FutureBuilder(
-          future: _playlist,
+          future: playlist,
           builder: (context, snapshot) {
             PlayList playlist = snapshot.data;
-
             if (!snapshot.hasData) {
               return SpinKitPulse(
                 size: 100,
@@ -86,7 +84,6 @@ class _DetailedSessionScreenState extends State<DetailedSessionScreen> {
               _controller = YoutubePlayerController(
                 initialVideoId: currentVideoID,
                 flags: YoutubePlayerFlags(
-                  forceHideAnnotation: true,
                   autoPlay: false,
                   mute: false,
                 ),
@@ -187,21 +184,5 @@ class _DetailedSessionScreenState extends State<DetailedSessionScreen> {
         ),
       );
     });
-  }
-}
-
-Future<PlayList> fetchPlaylist() async {
-  String playlistID = _session.courseLink.split("list=")[1];
-  String API_KEY = "AIzaSyBKnPJ-IxA__CXleozkk2uM-NqKdL4LVjU";
-
-  final response = await http.get(
-      'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=$playlistID&fields=items%2Fsnippet&key=$API_KEY');
-
-  if (response.statusCode == 200) {
-    // If the call to the server was successful, parse the JSON.
-    return PlayList.fromJson(json.decode(response.body));
-  } else {
-    // If that call was not successful, throw an error.
-    throw Exception('Failed to load playlist');
   }
 }

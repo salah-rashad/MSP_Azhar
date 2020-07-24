@@ -8,8 +8,8 @@ import 'package:intl/intl.dart' as Intl;
 import 'package:msp/models/event.dart';
 import 'package:msp/pages/home.dart';
 import 'package:msp/pages/tabs_screens/items_widgets/topic_item.dart';
+import 'package:msp/services/open_url.dart';
 import 'package:msp/ui/app_theme.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 //List<Widget> texts = <Widget>[];
 Event _event;
@@ -60,7 +60,7 @@ class _DetailedEventScreenState extends State<DetailedEventScreen> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           backgroundColor: AppTheme.tab1Primary,
-          onPressed: () => launchURL(_event.formLink),
+          onPressed: () => openURL(_event.formLink),
           label: Text("Enroll Now".toUpperCase()),
         ),
         body: ListView(
@@ -84,20 +84,6 @@ class _DetailedEventScreenState extends State<DetailedEventScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-//                  StreamBuilder(
-//                    stream: _streamController.stream,
-//                    builder: (context, snapshot) {
-//                      if (snapshot == null || !snapshot.hasData) {
-//                        return Column(
-//                          children: texts,
-//                        );
-//                      } else {
-//                        return Column(
-//                          children: snapshot.data,
-//                        );
-//                      }
-//                    },
-//                  )
                   Row(
                     children: <Widget>[
                       Container(
@@ -130,7 +116,7 @@ class _DetailedEventScreenState extends State<DetailedEventScreen> {
                       ),
                       Flexible(
                         child: InkWell(
-                          onTap: () => launchURL(_event.location),
+                          onTap: () => openURL(_event.location),
                           child: Text(
                             widget.location,
                             style: TextStyle(
@@ -246,19 +232,9 @@ class _DetailedEventScreenState extends State<DetailedEventScreen> {
           ],
         ));
   }
-}
 
-getDateTime(String date, String time) {
-  return Intl.DateFormat("dd/MM/yyyy - hh:mm a").format(
-    DateTime.parse("$date $time"),
-  );
-}
-
-launchURL(String url) async {
-  String mUrl = url;
-  if (await canLaunch(mUrl)) {
-    await launch(mUrl);
-  } else {
-    throw 'Could not launch $mUrl';
+  String getDateTime(String date, String time) {
+    return Intl.DateFormat("dd/MM/yyyy - hh:mm a")
+        .format(DateTime.parse("$date $time"));
   }
 }

@@ -11,7 +11,7 @@ description: A new Flutter application.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -33,9 +33,10 @@ dependencies:
   auto_direction: ^0.0.4+1
   expandable: ^4.1.2
   url_launcher: ^5.4.1
-  youtube_player_flutter: ^6.0.3+2
+  youtube_player_flutter: ^7.0.0+7
   flutter_swiper: ^1.1.6
   page_transition: ^1.1.5
+  flutter_markdown: ^0.4.2
   
 
 dev_dependencies:
@@ -77,15 +78,6 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: WorkSans
-      fonts:
-        - asset: assets/fonts/WorkSans-Regular.ttf
-        - asset: assets/fonts/WorkSans-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/WorkSans-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/WorkSans-Bold.ttf
-          weight: 700
     - family: Roboto
       fonts:
         - asset: assets/fonts/Roboto-Bold.ttf

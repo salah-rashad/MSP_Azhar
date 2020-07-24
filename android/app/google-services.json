@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "371828817096",
+    "firebase_url": "https://msp-app-1438c.firebaseio.com",
+    "project_id": "msp-app-1438c",
+    "storage_bucket": "msp-app-1438c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371828817096:android:5b30ce78073b0b4ef9f9fd",
+        "android_client_info": {
+          "package_name": "com.mspazhar.msp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "371828817096-kut6vf43294k0gmpva2ab5b56ps7ik17.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyj7RyRC7g_CSocjiebVJ-vKihu8hDlOs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "371828817096-kut6vf43294k0gmpva2ab5b56ps7ik17.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

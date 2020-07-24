@@ -1,47 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geocoder/model.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:msp/main.dart';
 import 'package:msp/models/event.dart';
 import 'package:msp/ui/app_theme.dart';
 import 'package:msp/utils/constants.dart';
 
 import '../../home.dart';
 
-class EventItem extends StatefulWidget {
+String _location = "";
+
+class EventItem extends StatelessWidget {
   final Event event;
   final Animation animation;
   final AnimationController animationController;
 
-  const EventItem(this.event, this.animation, this.animationController);
-
-  @override
-  _EventItemState createState() => _EventItemState();
-}
-
-class _EventItemState extends State<EventItem> {
-  String location = "";
-
-  @override
-  void initState() {
-    getAddress(widget.event.location).then((address) {
-      setState(() {
-        location = address.addressLine;
-      });
-    });
-    super.initState();
-  }
+  EventItem(this.event, this.animation, this.animationController);
 
   Widget _buildEventCard(BuildContext context, Event event) {
     return AnimatedBuilder(
-      animation: widget.animationController,
+      animation: animationController,
       builder: (BuildContext context, Widget child) {
         return FadeTransition(
-          opacity: widget.animation,
+          opacity: animation,
           child: new Transform(
             transform: new Matrix4.translationValues(
-                0.0, 30 * (1.0 - widget.animation.value), 0.0),
+                0.0, 30 * (1.0 - animation.value), 0.0),
             child: Container(
               height: 150.0,
               margin: new EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -94,7 +79,8 @@ class _EventItemState extends State<EventItem> {
                             event.price.contains(new RegExp('[A-Z,a-z]'))
                                 ? event.price
                                 : event.price + " EGP",
-                            style: TextStyle(color: HexColor('#0abde3')),
+                                textAlign: TextAlign.center,
+                            style: TextStyle(color: AppTheme.tab1Secondary),
                           )
                         ],
                       ),
@@ -128,7 +114,7 @@ class _EventItemState extends State<EventItem> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: HexColor('#ffffff').withOpacity(0.7),
+                              color: AppTheme.white.withOpacity(0.7),
                               fontSize: 14,
                             ),
                           ),
@@ -138,15 +124,23 @@ class _EventItemState extends State<EventItem> {
                           Expanded(
                             child: Align(
                               alignment: Alignment.bottomLeft,
-                              child: Text(
-                                location,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: HexColor('#ffffff').withOpacity(0.7),
-                                  fontSize: 12,
-                                ),
-                              ),
+                              child: FutureBuilder<Address>(
+                                  future: getAddress(event.location),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData)
+                                      return Container();
+                                    else
+                                      _location = snapshot.data.addressLine;
+                                    return Text(
+                                      _location,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: AppTheme.white.withOpacity(0.7),
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  }),
                             ),
                           )
                         ],
@@ -198,8 +192,8 @@ class _EventItemState extends State<EventItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, detailedEventRoute,
-          arguments: [widget.event, location]),
-      child: _buildEventCard(context, widget.event),
+          arguments: [event, _location]),
+      child: _buildEventCard(context, event),
     );
   }
 }
@@ -213,7 +207,9 @@ convertDateTime(String date, String time) {
   );
 }
 
-Future<Address> getAddress(String link) async {
+Future<Address> getAddress(String url) async {
+  final String finalURL = await http.read(url).then((value) => value);
+
   /// Getting coordinates from Google Maps location [link]
   // Example: https://www.google.com/maps/place/Al-Azhar+University/@30.0591754,31.3114623,17z/data=!3m1...
 
@@ -223,7 +219,7 @@ Future<Address> getAddress(String link) async {
   // so we split this location string into 3 parts.
 
   // first we split "/@"
-  final part1 = link.split("/@");
+  final part1 = finalURL.split("/@");
   // Result:
   // 0= "...ace/Al-Azhar+University" | 1= "30.0591754,31.3114623,17z/data=!3m1..."
 
@@ -239,7 +235,7 @@ Future<Address> getAddress(String link) async {
 
   /// Finally we get the coordinates,
   /// latitude (0) & longitude (1) from [part3].
-  
+
   double latitude = double.parse(part3[0]);
   double longitude = double.parse(part3[1]);
 
@@ -248,6 +244,7 @@ Future<Address> getAddress(String link) async {
   // getting list of possible addresses.
   var addresses =
       await Geocoder.local.findAddressesFromCoordinates(coordinates);
+
   /// Fianlly return the first element from the [addresses] list.
   return addresses.first;
 }
